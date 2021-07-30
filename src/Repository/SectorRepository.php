@@ -8,14 +8,14 @@
 
 namespace App\Repository;
 
-use App\Entity\Ticker;
+use App\Entity\Sector;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-class TickerRepository extends ServiceEntityRepository
+class SectorRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Ticker::class);
+        parent::__construct($registry, Sector::class);
     }
 }

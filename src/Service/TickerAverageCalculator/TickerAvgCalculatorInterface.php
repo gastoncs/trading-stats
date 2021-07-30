@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Service\TickerAverageCalculator;
+
 /**
  * Created by PhpStorm.
  * User: Gastón Cortés
@@ -8,7 +10,7 @@
  */
 interface TickerAvgCalculatorInterface
 {
-    public static function calculate(array $tickerPerformances);
+    public function calculate();
     public function getAvgOtolLower0();
     public function getAvgOtohGreater0();
     public function getAvgVolume();
@@ -17,4 +19,7 @@ interface TickerAvgCalculatorInterface
     public function getAvgOtoh();
     public function getAvgOtol();
     public function getAvgRange();
+    public function getEodGreater0();
+    public function getEodLess0();
+    public function getEodCount();
 }

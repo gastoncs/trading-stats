@@ -1,22 +1,40 @@
 {
     "devDependencies": {
+        "@fortawesome/fontawesome-free": "^5.8.1",
+        "@popperjs/core": "^2.9.2",
         "@symfony/stimulus-bridge": "^2.0.0",
-        "@symfony/webpack-encore": "^1.0.0",
+        "@symfony/webpack-encore": "1.5.0",
+        "bloodhound-js": "^1.2.3",
+        "bootstrap-sass": "^3.4.1",
+        "bootstrap-tagsinput": "^0.7.1",
         "core-js": "^3.0.0",
+        "css-loader": "^5.2.7",
+        "highlight.js": "^10.4.1",
+        "jquery": "^3.6.0",
+        "mini-css-extract-plugin": "^1.6.2",
         "regenerator-runtime": "^0.13.2",
+        "sass": "^1.35.2",
+        "sass-loader": "^10.0.0",
         "stimulus": "^2.0.0",
+        "webpack": "^5.44.0",
         "webpack-notifier": "^1.6.0"
     },
     "license": "UNLICENSED",
     "private": true,
     "scripts": {
-        "dev-server": "encore dev-server",
-        "dev": "encore dev",
-        "watch": "encore dev --watch",
-        "build": "encore production --progress"
+        "dev-server": "./node_modules/@symfony/webpack-encore/bin/encore.js dev-server",
+        "dev": "./node_modules/@symfony/webpack-encore/bin/encore.js dev",
+        "watch": "./node_modules/@symfony/webpack-encore/bin/encore.js dev --watch",
+        "build": "./node_modules/@symfony/webpack-encore/bin/encore.js production"
     },
     "name": "trading-stats",
     "version": "1.5.0",
     "main": "index.js",
-    "author": "Gaston Cortes <gastoncs@yahoo.es>"
+    "author": "Gaston Cortes <gastoncs@yahoo.es>",
+    "dependencies": {
+        "bootstrap": "^3.4.1",
+        "bootstrap-sass": "^3.4.1",
+        "bootswatch": "^3.4.0",
+        "lato-font": "^3.0.0"
+    }
 }

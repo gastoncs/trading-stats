@@ -11,18 +11,22 @@ namespace App\Service;
 use App\Entity\Ticker;
 
 use App\Entity\TickerAverage;
-use App\Service\TickerAverageCalculator\TickerAvgCalculatorInterface;
+use App\Service\TickerAverageCalculator\TickerAvgCalculatorByDayInterface;
 
-class TickerFactory
+class TickerAverageFactory
 {
-    public static function create(Ticker $ticker, TickerAvgCalculatorInterface $tickerAvgCalculator): Ticker
+    public static function create(Ticker $ticker,
+                                  TickerAvgCalculatorByDayInterface $tickerAvgCalculator,
+                                  int $day): TickerAverage
     {
         $tickerAvg = new TickerAverage();
 
-        $tickerAvgCalculatorObj = $tickerAvgCalculator->calculate();
+        $tickerAvgCalculatorObj = $tickerAvgCalculator->calculate($ticker, $day);
 
         $tickerAvg->setTicker($ticker);
+        $tickerAvg->setUpdated(new \DateTime());
 
+        $tickerAvg->setDayGap($tickerAvgCalculatorObj->getDayGap());
         $tickerAvg->setAvgVolume($tickerAvgCalculatorObj->getAvgVolume());
         $tickerAvg->setAvgGap($tickerAvgCalculatorObj->getAvgGap());
         $tickerAvg->setAvgEod($tickerAvgCalculatorObj->getAvgEDO());
@@ -35,13 +39,16 @@ class TickerFactory
         $tickerAvg->setEodLess0($tickerAvgCalculatorObj->getEodLess0());
         $tickerAvg->setEodCount($tickerAvgCalculatorObj->getEodCount());
 
-        return $ticker;
+        return $tickerAvg;
     }
 
-    public static function updateAverages(TickerAverage $tickerAvg, TickerAvgCalculatorInterface $tickerAvgCalculator): Ticker
+    public static function updateAverages(TickerAverage $tickerAvg,
+                                          TickerAvgCalculatorByDayInterface $tickerAvgCalculator,
+                                          int $day): TickerAverage
     {
-        $tickerAvgCalculatorObj = $tickerAvgCalculator->calculate();
+        $tickerAvgCalculatorObj = $tickerAvgCalculator->calculate($tickerAvg->getTicker(), $day);
 
+        $tickerAvg->setDayGap($tickerAvgCalculatorObj->getDayGap());
         $tickerAvg->setAvgVolume($tickerAvgCalculatorObj->getAvgVolume());
         $tickerAvg->setAvgGap($tickerAvgCalculatorObj->getAvgGap());
         $tickerAvg->setAvgEod($tickerAvgCalculatorObj->getAvgEDO());
@@ -50,9 +57,9 @@ class TickerFactory
         $tickerAvg->setAvgOtol($tickerAvgCalculatorObj->getAvgOtol());
         $tickerAvg->setAvgOtolLower0($tickerAvgCalculatorObj->getAvgOtolLower0());
         $tickerAvg->setAvgRange($tickerAvgCalculatorObj->getAvgRange());
-        $tickerAvg->setEodGreater0($tickerAvgCalculatorObj->getEodMuestraGreater0());
+        $tickerAvg->setEodGreater0($tickerAvgCalculatorObj->getEodGreater0());
         $tickerAvg->setEodLess0($tickerAvgCalculatorObj->getEodLess0());
-        $tickerAvg->setEodCount($tickerAvgCalculatorObj->getEodMuestra());
+        $tickerAvg->setEodCount($tickerAvgCalculatorObj->getEodCount());
 
         return $tickerAvg;
     }

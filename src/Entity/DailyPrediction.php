@@ -8,11 +8,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\TradeRepository")
- * @ORM\Table(name="trade")
- *
+ * @ORM\Entity(repositoryClass="App\Repository\DailyPredictionRepository")
+ * @ORM\Table(name="daily_prediction")
  */
-class Trade
+class DailyPrediction
 {
     /**
      * @var int
@@ -33,7 +32,7 @@ class Trade
     /**
      * @var TickerPerformance
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\TickerPerformance", inversedBy="trades")
+     * @ORM\ManyToOne(targetEntity="App\Entity\TickerPerformance", inversedBy="dailyPredictions")
      * @ORM\JoinColumn(nullable=false)
      */
     private $tickerPerformance;
@@ -42,7 +41,7 @@ class Trade
      * @var Tag[]|Collection
      *
      * @ORM\ManyToMany(targetEntity="App\Entity\Tag", cascade={"persist"})
-     * @ORM\JoinTable(name="trade_tag")
+     * @ORM\JoinTable(name="daily_prediction_tag")
      * @ORM\OrderBy({"name": "ASC"})
      * @Assert\Count(max="6", maxMessage="post.too_many_tags")
      */
@@ -52,7 +51,6 @@ class Trade
      * @var float
      *
      * @ORM\Column(type="decimal", name="possible_price_hi", scale=2, precision=11)
-     * @Assert\NotBlank
      */
     private $possiblePriceHi;
 
@@ -60,7 +58,6 @@ class Trade
      * @var float
      *
      * @ORM\Column(type="decimal", name="possible_price_low", scale=2, precision=11)
-     * @Assert\NotBlank
      */
     private $possiblePriceLow;
 
@@ -68,7 +65,6 @@ class Trade
      * @var float
      *
      * @ORM\Column(type="decimal", name="real_price_hi", scale=2, precision=11)
-     * @Assert\NotBlank
      */
     private $realPriceHi;
 
@@ -76,7 +72,6 @@ class Trade
      * @var float
      *
      * @ORM\Column(type="decimal", name="real_price_low", scale=2, precision=11)
-     * @Assert\NotBlank
      */
     private $realPriceLow;
 
@@ -84,7 +79,6 @@ class Trade
      * @var float
      *
      * @ORM\Column(type="decimal", name="difference_real_possible_price_hi", scale=2, precision=11)
-     * @Assert\NotBlank
      */
     private $diffRealPossiblePriceHi;
 
@@ -92,9 +86,22 @@ class Trade
      * @var float
      *
      * @ORM\Column(type="decimal", name="difference_real_possible_price_low", scale=2, precision=11)
-     * @Assert\NotBlank
      */
     private $diffRealPossiblePriceLow;
+
+    /**
+     * @var float
+     *
+     * @ORM\Column(type="decimal", name="accuracy_price_hi_prediction", scale=2, precision=11)
+     */
+    private $accuracyPriceHiPrediction;
+
+    /**
+     * @var float
+     *
+     * @ORM\Column(type="decimal", name="accuracy_price_low_prediction", scale=2, precision=11)
+     */
+    private $accuracyPriceLowPrediction;
 
     /**
      * @var Setup
@@ -105,7 +112,7 @@ class Trade
     private $setup;
 
     /**
-     * @ORM\Column(type="smallint", length=512, nullable=true)
+     * @ORM\Column(type="string", length=512)
      */
     private $notes;
 
@@ -184,7 +191,6 @@ class Trade
     {
         return $this->possiblePriceHi;
     }
-
 
     /**
      * @return float
@@ -267,6 +273,38 @@ class Trade
     }
 
     /**
+     * @return float
+     */
+    public function getAccuracyPriceHiPrediction(): float
+    {
+        return $this->accuracyPriceHiPrediction;
+    }
+
+    /**
+     * @param float $accuracyPriceHiPrediction
+     */
+    public function setAccuracyPriceHiPrediction(float $accuracyPriceHiPrediction)
+    {
+        $this->accuracyPriceHiPrediction = $accuracyPriceHiPrediction;
+    }
+
+    /**
+     * @return float
+     */
+    public function getAccuracyPriceLowPrediction(): float
+    {
+        return $this->accuracyPriceLowPrediction;
+    }
+
+    /**
+     * @param float $accuracyPriceLowPrediction
+     */
+    public function setAccuracyPriceLowPrediction(float $accuracyPriceLowPrediction)
+    {
+        $this->accuracyPriceLowPrediction = $accuracyPriceLowPrediction;
+    }
+
+    /**
      * @return Setup
      */
     public function getSetup(): Setup
@@ -313,5 +351,4 @@ class Trade
     {
         $this->traded = $traded;
     }
-
 }

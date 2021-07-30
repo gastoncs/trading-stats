@@ -1,13 +1,5 @@
 <?php
 
-/*
- * This file is part of the Symfony package.
- *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 
 namespace App\Entity;
 
@@ -15,10 +7,10 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity()
- * @ORM\Table(name="tag")
+ * @ORM\Table(name="waring_flag")
  *
  */
-class Tag implements \JsonSerializable
+class WarningFlag implements \JsonSerializable
 {
     /**
      * @var int
@@ -36,6 +28,13 @@ class Tag implements \JsonSerializable
      */
     private $name;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string",name="warning_type", unique=true)
+     */
+    private $warningType;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -49,6 +48,22 @@ class Tag implements \JsonSerializable
     public function getName(): ?string
     {
         return $this->name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getWarningType(): string
+    {
+        return $this->warningType;
+    }
+
+    /**
+     * @param string $warningType
+     */
+    public function setWarningType(string $warningType)
+    {
+        $this->warningType = $warningType;
     }
 
     /**

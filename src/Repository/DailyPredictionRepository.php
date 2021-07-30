@@ -9,6 +9,7 @@
 namespace App\Repository;
 
 
+
 class DailyPredictionRepository
 {
 

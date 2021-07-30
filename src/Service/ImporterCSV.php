@@ -8,7 +8,7 @@
 
 namespace App\Service;
 
-class ImportCSV
+class ImporterCSV
 {
     public static function importCSV($file)
     {

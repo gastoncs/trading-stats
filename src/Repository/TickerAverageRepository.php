@@ -9,25 +9,17 @@
 namespace App\Repository;
 
 use App\Entity\Ticker;
+use App\Entity\TickerAverage;
 use App\Entity\TickerPerformance;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Persistence\ManagerRegistry;
 
-class TickerPerformanceRepository extends ServiceEntityRepository
+class TickerAverageRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, TickerPerformance::class);
+        parent::__construct($registry, TickerAverage::class);
     }
 
-    public function findGapGreaterThan20ByTicker(Ticker $ticker)
-    {
-        $criteria = new Criteria();
-
-        $criteria->where($criteria->expr()->gt('gap', .1999));
-        $criteria->andWhere($criteria->expr()->eq('ticker', $ticker));
-        $criteria->orderBy(array("date" => Criteria::DESC));
-        return $this->matching($criteria);
-    }
 }

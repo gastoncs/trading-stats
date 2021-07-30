@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Service\TickerAverageCalculator;
+
 /**
  * Created by PhpStorm.
  * User: Gastón Cortés
@@ -8,6 +10,9 @@
  */
 class TickerAverageCalculator20Gap implements TickerAvgCalculatorInterface
 {
+    const GAP = 0.20;
+    const EODGreaterThan0 = 0;
+
     private $avgOtolLower0;
     private $avgOtohGreater0;
     private $avgVolume;
@@ -16,21 +21,36 @@ class TickerAverageCalculator20Gap implements TickerAvgCalculatorInterface
     private $avgOtoh;
     private $avgOtol;
     private $avgRange;
+    private $tickerPerformances;
+    private $eodGreater0;
+    private $eodLess0;
+    private $eodCount;
+    private $dayGap;
 
-    public static function calculate(array $tickerPerformances): TickerAverageOn20Gap
+    public function __construct(array $tickerPerformances)
     {
-        if(count($tickerPerformances) > 0){
-            (new self)->createAvgVolume($tickerPerformances);
-            (new self)->createAvgGap($tickerPerformances);
-            (new self)->createAvgEod($tickerPerformances);
-            (new self)->createAvgOtoh($tickerPerformances);
-            (new self)->createAvgOtohGreater0($tickerPerformances);
-            (new self)->createAvgOtol($tickerPerformances);
-            (new self)->createAvgOtolLower0($tickerPerformances);
-            (new self)->createAvgRange($tickerPerformances);
+        $this->tickerPerformances = $tickerPerformances;
+        $this->avgOtolLower0 = $this->avgOtohGreater0 = $this->avgVolume = 0;
+        $this->eodGreater0 = $this->avgGap = $this->avgEDO = $this->avgOtoh = 0;
+        $this->eodCount = $this->eodLess0 = $this->avgOtol = $this->avgRange = 0;
+        $this->dayGap = 0;
+    }
+
+    public function calculate(): TickerAverageCalculator20Gap
+    {
+        if(count($this->tickerPerformances) > 0){
+            $this->createAvgVolume();
+            $this->createAvgGap();
+            $this->createAvgEod();
+            $this->createAvgOtoh();
+            $this->createAvgOtohGreater0();
+            $this->createAvgOtol();
+            $this->createAvgOtolLower0();
+            $this->createAvgRange();
+            $this->eodGreater0();
         }
 
-        return self::;
+        return $this;
     }
 
     /**
@@ -97,12 +117,38 @@ class TickerAverageCalculator20Gap implements TickerAvgCalculatorInterface
         return $this->avgRange;
     }
 
-    private function createAvgVolume(array $tickerPerformances):float
+    /**
+     * @return int
+     */
+    public function getEodGreater0(): int
     {
-        $value = $voulme = $count = 0;
-        foreach($tickerPerformances as $i => $item) {
-            $voulme += $item->getVolume();
-            $count++;
+        return $this->eodGreater0;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEodLess0()
+    {
+        return $this->eodLess0;
+    }
+
+    /**
+     * @return int
+     */
+    public function getEodCount(): int
+    {
+        return $this->eodCount;
+    }
+
+    private function createAvgVolume()
+    {
+        $value = $voulme = $count = 0.00;
+        foreach($this->tickerPerformances as $i => $item) {
+            if($item->getGap() >= self::GAP ){
+                $voulme += $item->getVolume();
+                $count++;
+            }
         }
 
         if($voulme <> 0){
@@ -112,12 +158,14 @@ class TickerAverageCalculator20Gap implements TickerAvgCalculatorInterface
         return $this->avgVolume = $value;
     }
 
-    private function createAvgGap(array $tickerPerformances):float
+    private function createAvgGap():float
     {
         $value = $gapper = $count = 0;
-        foreach($tickerPerformances as $i => $item) {
-            $gapper += $item->getGap();
-            $count++;
+        foreach($this->tickerPerformances as $i => $item) {
+            if($item->getGap() >= self::GAP ){
+                $gapper += $item->getGap();
+                $count++;
+            }
         }
 
         if($gapper <> 0){
@@ -127,14 +175,15 @@ class TickerAverageCalculator20Gap implements TickerAvgCalculatorInterface
         return $this->avgGap = $value;
     }
 
-    private function createAvgEod(array $tickerPerformances): float
+    private function createAvgEod(): float
     {
         $value = $eod = $count = 0;
-        foreach($tickerPerformances as $i => $item) {
-            $eod += $item->getEod();
-            $count++;
+        foreach($this->tickerPerformances as $i => $item) {
+            if($item->getGap() >= self::GAP ){
+                $eod += $item->getEod();
+                $count++;
+            }
         }
-
 
         if($eod <> 0){
             $value = round($eod / $count,4);
@@ -143,12 +192,14 @@ class TickerAverageCalculator20Gap implements TickerAvgCalculatorInterface
         return $this->avgEDO = $value;
     }
 
-    private function createAvgOtoh(array $tickerPerformances): float
+    private function createAvgOtoh(): float
     {
         $value = $otoh = $count = 0;
-        foreach($tickerPerformances as $i => $item) {
-            $otoh += $item->getOtoh();
-            $count++;
+        foreach($this->tickerPerformances as $i => $item) {
+            if($item->getGap() >= self::GAP ){
+                $otoh += $item->getOtoh();
+                $count++;
+            }
         }
 
         if($otoh <> 0){
@@ -157,14 +208,16 @@ class TickerAverageCalculator20Gap implements TickerAvgCalculatorInterface
         return $this->avgOtoh = $value;
     }
 
-    private function createAvgOtohGreater0(array $tickerPerformances): float
+    private function createAvgOtohGreater0(): float
     {
         $value = $otoh = $count = 0;
-        foreach($tickerPerformances as $i => $item) {
+        foreach($this->tickerPerformances as $i => $item) {
 
             if($item->getOtoh() > 0){
-                $otoh += $item->getOtoh();
-                $count++;
+                if($item->getGap() >= self::GAP ){
+                    $otoh += $item->getOtoh();
+                    $count++;
+                }
             }
         }
 
@@ -174,12 +227,14 @@ class TickerAverageCalculator20Gap implements TickerAvgCalculatorInterface
         return $this->avgOtohGreater0 = $value;
     }
 
-    private function createAvgOtol(array $tickerPerformances): float
+    private function createAvgOtol(): float
     {
         $value = $otol = $count = 0;
-        foreach($tickerPerformances as $i => $item) {
-            $otol += $item->getOtol();
-            $count++;
+        foreach($this->tickerPerformances as $i => $item) {
+            if($item->getGap() >= self::GAP ){
+                $otol += $item->getOtol();
+                $count++;
+            }
         }
 
         if($otol <> 0){
@@ -189,14 +244,16 @@ class TickerAverageCalculator20Gap implements TickerAvgCalculatorInterface
         return $this->avgOtol = $value;
     }
 
-    private function createAvgOtolLower0(array $tickerPerformances): float
+    private function createAvgOtolLower0(): float
     {
         $value = $otol = $count = 0;
-        foreach($tickerPerformances as $i => $item) {
+        foreach($this->tickerPerformances as $i => $item) {
 
             if($item->getOtol() < 0){
-                $otol += $item->getOtol();
-                $count++;
+                if($item->getGap() >= self::GAP ) {
+                    $otol += $item->getOtol();
+                    $count++;
+                }
             }
         }
 
@@ -207,12 +264,14 @@ class TickerAverageCalculator20Gap implements TickerAvgCalculatorInterface
         return $this->avgOtolLower0 = $value;
     }
 
-    private function createAvgRange(array $tickerPerformances): float
+    private function createAvgRange(): float
     {
         $value = $range = $count = 0;
-        foreach($tickerPerformances as $i => $item) {
-            $range += $item->getRangeInPrice();
-            $count++;
+        foreach($this->tickerPerformances as $i => $item) {
+            if($item->getGap() >= self::GAP ) {
+                $range += $item->getRangeInPrice();
+                $count++;
+            }
         }
 
         if($range <> 0){
@@ -220,5 +279,32 @@ class TickerAverageCalculator20Gap implements TickerAvgCalculatorInterface
         }
 
         return $this->avgRange = $value;
+    }
+
+    /**
+     * @return float
+     */
+    private function eodGreater0(): float
+    {
+        $eodCount = $eodNegCount = $count = 0;
+        foreach($this->tickerPerformances as $i => $item) {
+
+            if($item->getGap() >= self::GAP ) {
+                if($item->getEod() > self::EODGreaterThan0){
+                    $eodCount++;
+                }else{
+                    $eodNegCount++;
+                }
+                $count++;
+            }
+        }
+
+        if($count > 0){
+            $this->eodGreater0 = round($eodCount / $count,2);
+            $this->eodLess0 = round($eodNegCount / $count,2);
+            $this->eodCount = $count;
+        }
+
+        return $this->eodGreater0;
     }
 }

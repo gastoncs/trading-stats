@@ -9,16 +9,28 @@
 
 namespace App\Service;
 
+use App\Entity\Industry;
+use App\Entity\Sector;
+use App\Entity\Ticker;
 use App\Entity\TickerPerformance;
 
-class TicketPerformanceFactory
+class TickerPerformanceFactory
 {
-    private static $data;
+    public static $data;
+    public static $tickerName;
 
-    public static function create($ticker, $dateTime, $open, $hi, $low, $close, $volume, $atr, $float, $shortFloat,
-                                                   $insidersOwn, $institutionOwn, $dilution, $marketCap, $news, $etb, $ssr, $floatRotation,
-                                                   $sector, $industry): TickerPerformance
+    public static function create(Ticker $ticker, $dateTime, $open, $hi, $low, $close, $volume, $atr=0.00, $float=0.00, $shortFloat=0.00,
+                                       $insidersOwn=0.00, $institutionOwn=0.00, $dilution=0.00, $marketCap=0.00, $news=null,
+                                        $etb=0,$ssr=0, $floatRotation=0,$sector=null, $industry=null): TickerPerformance
     {
+        //Reset the static variable when a new ticket
+        if(self::$tickerName != $ticker->getCode()){
+            self::$data = NULL;
+            CalculateDaysOn20Gap::resetValues();
+        }
+
+        self::$tickerName = $ticker->getCode();
+
         $eod = (new self)->createEOD($open, $close);
         $gap = (new self)->createGap($open, $close);
         $otoh = (new self)->createOtoh($hi, $open);
@@ -50,23 +62,29 @@ class TicketPerformanceFactory
         $tp->setEtb($etb);
         $tp->setSsr($ssr);
         $tp->setFloatRotation($floatRotation);
-        $tp->setSector($sector);
-        $tp->setIndustry($industry);
+
+        $tp->setDayGap(CalculateDaysOn20Gap::calculate($gap));
+
+        if($sector instanceof Sector){
+            $tp->setSector($sector);
+        }
+        if($industry instanceof Industry){
+            $tp->setIndustry($industry);
+        }
 
         return $tp;
     }
 
     private function createGap($open, $close)
     {
-        //$dateFormatUnix = strtotime($date);
-
-        $lastClose = self::$data[0];
+        $lastClose = self::$data;
 
         $gap = 0;
         if($lastClose != ""){
-            $gap = ($open / $lastClose) -1;
-            self::$data[0] = $close;
+            $gap = round(($open / $lastClose) -1, 4);
         }
+
+        self::$data = $close;
 
         return $gap;
     }

@@ -12,7 +12,7 @@ use App\Entity\TickerOpenToHi;
 use App\Entity\TickerPerformance;
 use App\Entity\Ticker;
 
-class TickerOpenToHiGapByDayFactory
+class TickerOpenToHiByDayFactory
 {
     private $tickerPerformances;
     private $ticker;
@@ -30,6 +30,7 @@ class TickerOpenToHiGapByDayFactory
         $tickerOpenToHi = new TickerOpenToHi();
 
         $tickerOpenToHi->setTicker($this->ticker);
+        $tickerOpenToHi->setDay($this->day);
 
         foreach ($this->tickerPerformances as $tickerPerformance)
         {

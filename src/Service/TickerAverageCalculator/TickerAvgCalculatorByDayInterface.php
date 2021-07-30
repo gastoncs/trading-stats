@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Service\TickerAverageCalculator;
+use App\Entity\Ticker;
 
 /**
  * Created by PhpStorm.
@@ -8,9 +9,9 @@ namespace App\Service\TickerAverageCalculator;
  * Date: 7/15/21
  * Time: 6:05 PM
  */
-interface TickerAvgCalculatorInterface
+interface TickerAvgCalculatorByDayInterface
 {
-    public function calculate();
+    public function calculate(Ticker $ticker, int $day);
     public function getAvgOtolLower0();
     public function getAvgOtohGreater0();
     public function getAvgVolume();
@@ -22,4 +23,5 @@ interface TickerAvgCalculatorInterface
     public function getEodGreater0();
     public function getEodLess0();
     public function getEodCount();
+    public function getDayGap();
 }

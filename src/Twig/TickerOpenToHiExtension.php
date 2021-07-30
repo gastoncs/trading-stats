@@ -8,8 +8,21 @@
 
 namespace App\Twig;
 
-
-class TickerOpenToHiExtension
+use App\Entity\Ticker;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
+class TickerOpenToHiExtension extends AbstractExtension
 {
+    public function getFilters()
+    {
+        return [
+            new TwigFilter('getOpenToHiProbabilities', [$this, 'getOpenToHi']),
+        ];
+    }
 
+    public function getOpenToHi(Ticker $ticker, $range, $day)
+    {
+        $tickerOpenToHi = $ticker->{'getOpenToHiPercentageDay'.$day}();
+        return $tickerOpenToHi->{$range}();
+    }
 }

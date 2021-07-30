@@ -4,64 +4,541 @@
 
 {% block main %}
 
-    <h1>Prueba</h1>
+    <h3>{{ ticker.code }}</h3>
 
-    {#<p class="post-metadata">#}
-        {#<span class="metadata"><i class="fa fa-calendar"></i> {{ post.publishedAt|format_datetime('long', 'medium', '', 'UTC') }}</span>#}
-        {#<span class="metadata"><i class="fa fa-user"></i> {{ post.author.fullName }}</span>#}
-    {#</p>#}
+    {% set firstTickerAverage = ticker.getTickerAverages[0] %}
+
+    <div class="row" style="margin-top: 3rem !important">
+        <div class="panel panel-default">
+            <div class="panel-heading">Day one</div>
+            <div class="panel-body">
+
+                <div class="row">
+                    <div class="col-lg-2">
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <span class="badge">{{ firstTickerAverage.getEodCount }}</span>
+                                Muestra
+                            </li>
+                            <li class="list-group-item">
+                                <span class="badge">{{ firstTickerAverage.eodGreater0 | format_number(style='percent')}}</span>
+                                %EOD+
+                            </li>
+                            <li class="list-group-item">
+                                <span class="badge">{{ firstTickerAverage.eodLess0 | format_number(style='percent')}}</span>
+                                %EOD-
+                            </li>
+                        </ul>
+
+                        <h5>From OtoH</h5>
+                        <div>
+                            <ul class="list-group">
+                                <li class="list-group-item">
+                                    <span class="badge">{{ ticker | getOpenToHiProbabilities('getFrom0To20',1) }}</span>
+                                    0% a 20%
+                                </li>
+                                <li class="list-group-item">
+                                    <span class="badge">{{ ticker | getOpenToHiProbabilities('getFrom30To40',1) }}</span>
+                                    30% a 40%
+                                </li>
+                                <li class="list-group-item">
+                                    <span class="badge">{{ ticker | getOpenToHiProbabilities('getFrom50To60',1) }}</span>
+                                    50% a 60%
+                                </li>
+                                <li class="list-group-item">
+                                    <span class="badge">{{ ticker | getOpenToHiProbabilities('getFrom70To80',1) }}</span>
+                                    70% a 80%
+                                </li>
+                                <li class="list-group-item">
+                                    <span class="badge">{{ ticker | getOpenToHiProbabilities('getFrom90To100s',1) }}</span>
+                                    90% a 100% >
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                            <tr>
+                                <th scope="col">Volume</th>
+                                <th scope="col">Gap</th>
+                                <th scope="col">OtoH</th>
+                                <th scope="col">OtoL</th>
+                                <th scope="col">EOD%</th>
+                                <th scope="col">Range</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr class="info">
+                                <td>{{ firstTickerAverage.avgVolume}}</td>
+                                <td id="avgGapFirst">{{ firstTickerAverage.avgGap|format_number(style='percent')}}</td>
+                                <td id="avgOtohFirst">{{ firstTickerAverage.avgOtoh|format_number(style='percent') }}</td>
+                                <td id="avgOtolFirst">{{ firstTickerAverage.avgOtol|format_number(style='percent') }}</td>
+                                <td id="avgEodFirst">{{ firstTickerAverage.avgEod|format_number(style='percent') }}</td>
+                                <td id="avgRangeFirst">{{ firstTickerAverage.avgRange}}</td>
+                            </tr>
+                            <tr class="danger">
+                                <td></td>
+                                <td></td>
+                                <td id="avgOtohGreater0First">{{ firstTickerAverage.avgOtoh|format_number(style='percent') }}</td>
+                                <td id="avgOtolLower0First">{{ firstTickerAverage.avgOtol|format_number(style='percent') }}</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-lg-3">
+                        <div id="chart_ticker_avg_first" style="width: 100%; height: 200px;"></div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div id="chart_ticker_performance_first" style="width: 100%; height: 300px;"></div>
+                    </div>
+                </div>
+
+                <h3>Data</h3>
+                <hr>
+                <div class=scroll_style style="margin-top: 3rem !important">
+                    <table id="ticker-performance" class="table table-striped table-hover">
+                        <thead>
+                        <tr>
+                            <th scope="col">Date</th>
+                            <th scope="col">Hi</th>
+                            <th scope="col">Low</th>
+                            <th scope="col">Open</th>
+                            <th scope="col">Close</th>
+                            <th scope="col">Volume</th>
+                            <th scope="col">Gap</th>
+                            <th scope="col">OtoHi</th>
+                            <th scope="col">OtoLow</th>
+                            <th scope="col">EOD</th>
+                            <th scope="col">Range</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for ticker_performance in tickerPerformancesDay1 %}
+                            <tr>
+                                <td class="date-per">{{ ticker_performance.date |date("d/m/Y") }}</td>
+                                <td>{{ ticker_performance.hi }}</td>
+                                <td>{{ ticker_performance.low }}</td>
+                                <td>{{ ticker_performance.open }}</td>
+                                <td>{{ ticker_performance.close }}</td>
+                                <td>{{ ticker_performance.volume }}</td>
+                                <td>{{ ticker_performance.gap |format_number(style='percent')}}</td>
+                                <td class="otoh-per">{{ ticker_performance.otoh |format_number(style='percent') }}</td>
+                                <td class="otol-per">{{ ticker_performance.otol |format_number(style='percent')}}</td>
+                                <td class="eod-per">{{ ticker_performance.eod |format_number(style='percent')}}</td>
+                                <td>{{ ticker_performance.rangeInPrice }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% set secondTickerAverage = ticker.getTickerAverages[1] %}
+
+    <div class="row">
+        <div class="panel panel-default">
+            <div class="panel-heading">Day two</div>
+            <div class="panel-body">
+
+                <div class="row">
+                    <div class="col-lg-2">
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <span class="badge">{{ secondTickerAverage.getEodCount }}</span>
+                                Muestra
+                            </li>
+                            <li class="list-group-item">
+                                <span class="badge">{{ secondTickerAverage.eodGreater0 | format_number(style='percent')}}</span>
+                                %EOD+
+                            </li>
+                            <li class="list-group-item">
+                                <span class="badge">{{ secondTickerAverage.eodLess0 | format_number(style='percent')}}</span>
+                                %EOD-
+                            </li>
+                        </ul>
+                        <h5>From OtoH</h5>
+                        <div>
+                            <ul class="list-group">
+                                <li class="list-group-item">
+                                    <span class="badge">{{ ticker | getOpenToHiProbabilities('getFrom0To20',2) }}</span>
+                                    0% a 20%
+                                </li>
+                                <li class="list-group-item">
+                                    <span class="badge">{{ ticker | getOpenToHiProbabilities('getFrom30To40',2) }}</span>
+                                    30% a 40%
+                                </li>
+                                <li class="list-group-item">
+                                    <span class="badge">{{ ticker | getOpenToHiProbabilities('getFrom50To60',2) }}</span>
+                                    50% a 60%
+                                </li>
+                                <li class="list-group-item">
+                                    <span class="badge">{{ ticker | getOpenToHiProbabilities('getFrom70To80',2) }}</span>
+                                    70% a 80%
+                                </li>
+                                <li class="list-group-item">
+                                    <span class="badge">{{ ticker | getOpenToHiProbabilities('getFrom90To100s',2) }}</span>
+                                    90% a 100% >
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                            <tr>
+                                <th scope="col">Volume</th>
+                                <th scope="col">Gap</th>
+                                <th scope="col">OtoH</th>
+                                <th scope="col">OtoL</th>
+                                <th scope="col">EOD%</th>
+                                <th scope="col">Range</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr class="info">
+                                <td>{{ secondTickerAverage.avgVolume}}</td>
+                                <td id="avgGapSecond">{{ secondTickerAverage.avgGap|format_number(style='percent')}}</td>
+                                <td id="avgOtohSecond">{{ secondTickerAverage.avgOtoh|format_number(style='percent') }}</td>
+                                <td id="avgOtolSecond">{{ secondTickerAverage.avgOtol|format_number(style='percent') }}</td>
+                                <td id="avgEodSecond">{{ secondTickerAverage.avgEod|format_number(style='percent') }}</td>
+                                <td id="avgRangeSecond">{{ secondTickerAverage.avgRange}}</td>
+                            </tr>
+                            <tr class="danger">
+                                <td></td>
+                                <td></td>
+                                <td id="avgOtohGreater0Second">{{ secondTickerAverage.avgOtoh|format_number(style='percent') }}</td>
+                                <td id="avgOtolLower0Second">{{ secondTickerAverage.avgOtol|format_number(style='percent') }}</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-lg-3">
+                        <div id="chart_ticker_avg_second" style="width: 100%; height: 200px;"></div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div id="chart_ticker_performance_second" style="width: 100%; height: 300px;"></div>
+                    </div>
+                </div>
+
+                <h3>Data</h3>
+                <hr>
+                <div class=scroll_style style="margin-top: 3rem !important">
+                    <table id="ticker-performance-second" class="table table-striped table-hover">
+                        <thead>
+                        <tr>
+                            <th scope="col">Date</th>
+                            <th scope="col">Hi</th>
+                            <th scope="col">Low</th>
+                            <th scope="col">Open</th>
+                            <th scope="col">Close</th>
+                            <th scope="col">Volume</th>
+                            <th scope="col">Gap</th>
+                            <th scope="col">OtoHi</th>
+                            <th scope="col">OtoLow</th>
+                            <th scope="col">EOD</th>
+                            <th scope="col">Range</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for ticker_performance in tickerPerformancesDay2 %}
+                            <tr>
+                                <td class="date-per-sec">{{ ticker_performance.date |date("d/m/Y") }}</td>
+                                <td>{{ ticker_performance.hi }}</td>
+                                <td>{{ ticker_performance.low }}</td>
+                                <td>{{ ticker_performance.open }}</td>
+                                <td>{{ ticker_performance.close }}</td>
+                                <td>{{ ticker_performance.volume }}</td>
+                                <td>{{ ticker_performance.gap |format_number(style='percent')}}</td>
+                                <td class="otoh-per-sec">{{ ticker_performance.otoh |format_number(style='percent') }}</td>
+                                <td class="otol-per-sec">{{ ticker_performance.otol |format_number(style='percent')}}</td>
+                                <td class="eod-per-sec">{{ ticker_performance.eod |format_number(style='percent')}}</td>
+                                <td>{{ ticker_performance.rangeInPrice }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% set thirdTickerAverage = ticker.getTickerAverages[2] %}
+
+    <div class="row">
+        <div class="panel panel-default">
+            <div class="panel-heading">Day three</div>
+            <div class="panel-body">
+
+                <div class="row">
+                    <div class="col-lg-2">
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <span class="badge">{{ thirdTickerAverage.getEodCount }}</span>
+                                Muestra
+                            </li>
+                            <li class="list-group-item">
+                                <span class="badge">{{ thirdTickerAverage.eodGreater0 | format_number(style='percent')}}</span>
+                                %EOD+
+                            </li>
+                            <li class="list-group-item">
+                                <span class="badge">{{ thirdTickerAverage.eodLess0 | format_number(style='percent')}}</span>
+                                %EOD-
+                            </li>
+                        </ul>
+                        <h5>From OtoH</h5>
+                        <div>
+                            <ul class="list-group">
+                                <li class="list-group-item">
+                                    <span class="badge">{{ ticker | getOpenToHiProbabilities('getFrom0To20',3) }}</span>
+                                    0% a 20%
+                                </li>
+                                <li class="list-group-item">
+                                    <span class="badge">{{ ticker | getOpenToHiProbabilities('getFrom30To40',3) }}</span>
+                                    30% a 40%
+                                </li>
+                                <li class="list-group-item">
+                                    <span class="badge">{{ ticker | getOpenToHiProbabilities('getFrom50To60',3) }}</span>
+                                    50% a 60%
+                                </li>
+                                <li class="list-group-item">
+                                    <span class="badge">{{ ticker | getOpenToHiProbabilities('getFrom70To80',3) }}</span>
+                                    70% a 80%
+                                </li>
+                                <li class="list-group-item">
+                                    <span class="badge">{{ ticker | getOpenToHiProbabilities('getFrom90To100s',3) }}</span>
+                                    90% a 100% >
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                            <tr>
+                                <th scope="col">Volume</th>
+                                <th scope="col">Gap</th>
+                                <th scope="col">OtoH</th>
+                                <th scope="col">OtoL</th>
+                                <th scope="col">EOD%</th>
+                                <th scope="col">Range</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr class="info">
+                                <td>{{ thirdTickerAverage.avgVolume}}</td>
+                                <td id="avgGapThird">{{ thirdTickerAverage.avgGap|format_number(style='percent')}}</td>
+                                <td id="avgOtohThird">{{ thirdTickerAverage.avgOtoh|format_number(style='percent') }}</td>
+                                <td id="avgOtolThird">{{ thirdTickerAverage.avgOtol|format_number(style='percent') }}</td>
+                                <td id="avgEodThird">{{ thirdTickerAverage.avgEod|format_number(style='percent') }}</td>
+                                <td id="avgRangeThird">{{ thirdTickerAverage.avgRange}}</td>
+                            </tr>
+                            <tr class="danger">
+                                <td></td>
+                                <td></td>
+                                <td id="avgOtohGreater0Third">{{ thirdTickerAverage.avgOtoh|format_number(style='percent') }}</td>
+                                <td id="avgOtolLower0Third">{{ thirdTickerAverage.avgOtol|format_number(style='percent') }}</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-lg-3">
+                        <div id="chart_ticker_avg_third" style="width: 100%; height: 200px;"></div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div id="chart_ticker_performance_third" style="width: 100%; height: 300px;"></div>
+                    </div>
+                </div>
+
+                <h3>Data</h3>
+                <hr>
+                <div class=scroll_style style="margin-top: 3rem !important">
+                    <table id="ticker-performance-third" class="table table-striped table-hover">
+                        <thead>
+                        <tr>
+                            <th scope="col">Date</th>
+                            <th scope="col">Hi</th>
+                            <th scope="col">Low</th>
+                            <th scope="col">Open</th>
+                            <th scope="col">Close</th>
+                            <th scope="col">Volume</th>
+                            <th scope="col">Gap</th>
+                            <th scope="col">OtoHi</th>
+                            <th scope="col">OtoLow</th>
+                            <th scope="col">EOD</th>
+                            <th scope="col">Range</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for ticker_performance in tickerPerformancesDay3 %}
+                            <tr>
+                                <td class="date-per-third">{{ ticker_performance.date |date("d/m/Y") }}</td>
+                                <td>{{ ticker_performance.hi }}</td>
+                                <td>{{ ticker_performance.low }}</td>
+                                <td>{{ ticker_performance.open }}</td>
+                                <td>{{ ticker_performance.close }}</td>
+                                <td>{{ ticker_performance.volume }}</td>
+                                <td>{{ ticker_performance.gap |format_number(style='percent')}}</td>
+                                <td class="otoh-per-third">{{ ticker_performance.otoh |format_number(style='percent') }}</td>
+                                <td class="otol-per-third">{{ ticker_performance.otol |format_number(style='percent')}}</td>
+                                <td class="eod-per-third">{{ ticker_performance.eod |format_number(style='percent')}}</td>
+                                <td>{{ ticker_performance.rangeInPrice }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
-    {#{{ include('blog/_post_tags.html.twig') }}#}
 
-    {#<div id="post-add-comment" class="well">#}
-        {#<p>#}
-            {#<a class="btn btn-success" href="{{ path('security_login', {'redirect_to': app.request.pathInfo}) }}">#}
-                {#<i class="fa fa-sign-in" aria-hidden="true"></i> {{ 'action.sign_in'|trans }}#}
-            {#</a>#}
-            {#{{ 'post.to_publish_a_comment'|trans }}#}
-        {#</p>#}
-    {#</div>#}
-
-    {#<h3>#}
-        {#<i class="fa fa-comments" aria-hidden="true"></i> {{ 'post.num_comments'|trans({ 'count': post.comments|length }) }}#}
-    {#</h3>#}
-
-    {#{% for comment in post.comments %}#}
-        {#<div class="row post-comment">#}
-            {#<a name="comment_{{ comment.id }}"></a>#}
-            {#<h4 class="col-sm-3">#}
-                {#<strong>{{ comment.author.fullName }}</strong> {{ 'post.commented_on'|trans }}#}
-                {# it's not mandatory to set the timezone in localizeddate(). This is done to#}
-                   {#avoid errors when the 'intl' PHP extension is not available and the application#}
-                   {#is forced to use the limited "intl polyfill", which only supports UTC and GMT #}
-                {#<strong>{{ comment.publishedAt|format_datetime('medium', 'short', '', 'UTC') }}</strong>#}
-            {#</h4>#}
-            {#<div class="col-sm-9">#}
-                {#{{ comment.content|markdown_to_html|sanitize_html }}#}
+    {#<div class="row" style="margin-top: 3rem !important">#}
+        {#<div class="panel panel-default">#}
+            {#<div class="panel-heading">Daily Prediction</div>#}
+            {#<div class="panel-body">#}
+                {#<table class="table table-striped table-hover">#}
+                    {#<thead>#}
+                    {#<tr>#}
+                        {#<th scope="col">Setup</th>#}
+                        {#<th scope="col">Date</th>#}
+                        {#<th scope="col">Open</th>#}
+                        {#<th scope="col">Possible Squeeze</th>#}
+                        {#<th scope="col">Possible Low</th>#}
+                        {#<th scope="col">Real Hi</th>#}
+                        {#<th scope="col">Real bounce %</th>#}
+                        {#<th scope="col">Real Low</th>#}
+                        {#<th scope="col">Real Low %</th>#}
+                        {#<th scope="col">Acc Hi</th>#}
+                        {#<th scope="col">Acc Low</th>#}
+                    {#</tr>#}
+                    {#</thead>#}
+                    {#<tbody>#}
+                    {#<tr>#}
+                        {#<td>Column content</td>#}
+                        {#<td>Column content</td>#}
+                        {#<td>Column content</td>#}
+                        {#<td>Column content</td>#}
+                        {#<td>Column content</td>#}
+                        {#<td>Column content</td>#}
+                        {#<td>Column content</td>#}
+                        {#<td>Column content</td>#}
+                        {#<td>Column content</td>#}
+                        {#<td>Column content</td>#}
+                        {#<td>Column content</td>#}
+                    {#</tr>#}
+                    {#</tbody>#}
+                {#</table>#}
             {#</div>#}
         {#</div>#}
-    {#{% else %}#}
-        {#<div class="post-comment">#}
-            {#<p>{{ 'post.no_comments'|trans }}</p>#}
-        {#</div>#}
-    {#{% endfor %}#}
+    {#</div>#}
+
+    {#<div class="row" style="margin-top: 3rem !important">#}
+        {#<table class="table table-striped table-hover">#}
+            {#<thead>#}
+            {#<tr>#}
+                {#<th scope="col">Setup</th>#}
+                {#<th scope="col">Date</th>#}
+                {#<th scope="col">Bounce at the OPEN</th>#}
+                {#<th scope="col">Tank at the OPEN</th>#}
+                {#<th scope="col">Choppy at the OPEN</th>#}
+                {#<th scope="col">VWAP rejection</th>#}
+                {#<th scope="col">VWAP rejection time</th>#}
+                {#<th scope="col">HOD</th>#}
+                {#<th scope="col">HOD time</th>#}
+                {#<th scope="col">LOD</th>#}
+                {#<th scope="col">LOD time</th>#}
+            {#</tr>#}
+            {#</thead>#}
+            {#<tbody>#}
+            {#<tr class="info">#}
+                {#<td>Column content</td>#}
+                {#<td>Column content</td>#}
+                {#<td>Column content</td>#}
+                {#<td>Column content</td>#}
+                {#<td>Column content</td>#}
+                {#<td>Column content</td>#}
+                {#<td>Column content</td>#}
+                {#<td>Column content</td>#}
+                {#<td>Column content</td>#}
+                {#<td>Column content</td>#}
+                {#<td>Column content</td>#}
+            {#</tr>#}
+            {#</tbody>#}
+        {#</table>#}
+    {#</div>#}
+
+    {#<div class="row" style="margin-top: 3rem !important">#}
+        {#<table class="table table-striped table-hover">#}
+            {#<thead>#}
+            {#<tr>#}
+                {#<th scope="col">Setup</th>#}
+                {#<th scope="col">Date</th>#}
+                {#<th scope="col">HOD before ZB</th>#}
+                {#<th scope="col">ZB</th>#}
+                {#<th scope="col">ZB time</th>#}
+                {#<th scope="col">ZB Hi</th>#}
+                {#<th scope="col">ZB Hi to HOD</th>#}
+            {#</tr>#}
+            {#</thead>#}
+            {#<tbody>#}
+            {#<tr class="info">#}
+                {#<td>Column content</td>#}
+                {#<td>Column content</td>#}
+                {#<td>Column content</td>#}
+                {#<td>Column content</td>#}
+                {#<td>Column content</td>#}
+                {#<td>Column content</td>#}
+                {#<td>Column content</td>#}
+            {#</tr>#}
+            {#</tbody>#}
+        {#</table>#}
+    {#</div>#}
+
+    {#<div class="row" style="margin-top: 3rem !important">#}
+        {#<table class="table table-striped table-hover">#}
+            {#<thead>#}
+            {#<tr>#}
+                {#<th scope="col">Setup</th>#}
+                {#<th scope="col">Date</th>#}
+                {#<th scope="col">ADF</th>#}
+                {#<th scope="col">Channel T</th>#}
+                {#<th scope="col">EOD breakdown</th>#}
+                {#<th scope="col">EOD squeeze</th>#}
+                {#<th scope="col">Squeeze time</th>#}
+                {#<th scope="col">Above or Below#}
+                {#<th scope="col">Link to charts</th>#}
+            {#</tr>#}
+            {#</thead>#}
+            {#<tbody>#}
+            {#<tr class="info">#}
+                {#<td>Column content</td>#}
+                {#<td>Column content</td>#}
+                {#<td>Column content</td>#}
+                {#<td>Column content</td>#}
+                {#<td>Column content</td>#}
+                {#<td>Column content</td>#}
+                {#<td>Column content</td>#}
+                {#<td>Column content</td>#}
+                {#<td>Column content</td>#}
+            {#</tr>#}
+            {#</tbody>#}
+        {#</table>#}
+    {#</div>#}
+
 
 {% endblock %}
 
 {#{% block sidebar %}#}
-    {#{% if is_granted('edit', post) %}#}
-        {#<div class="section">#}
-            {#<a class="btn btn-lg btn-block btn-success" href="{{ path('admin_post_edit', {id: post.id}) }}">#}
-                {#<i class="fa fa-edit" aria-hidden="true"></i> {{ 'action.edit_post'|trans }}#}
-            {#</a>#}
-        {#</div>#}
-    {#{% endif %}#}
-
-    {# the parent() function includes the contents defined by the parent template#}
-      {#('base.html.twig') for this block ('sidebar'). This is a very convenient way#}
-      {#to share common contents in different templates #}
     {#{{ parent() }}#}
-
-    {#{{ show_source_code(_self) }}#}
 {#{% endblock %}#}

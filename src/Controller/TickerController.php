@@ -73,7 +73,8 @@ class TickerController extends AbstractController
     {
         $sector = $sectorRepository->findOneBy(array('name'=>'default'));
         $industry = $industryRepository->findOneBy(array('name'=>'default'));
-        $filePath = "/Users/gastoncs/Downloads/".$ticker->getCode().".csv";
+
+        $filePath = $this->getParameter('csv_file_location').$ticker->getCode().".csv";
 
         $importer = new ImporCSVTickerProcess($tickerAverageRepository,
                                                 $tickerPerformanceRepository,

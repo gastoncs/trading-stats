@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block main %}
+
+
+    <div class="col-lg-4">
+        <h1>{{ ticker }}</h1>
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">Número de registros importados</h3>
+            </div>
+            <div class="panel-body">
+                {{ rowCount}}
+            </div>
+        </div>
+    </div>
+{% endblock %}

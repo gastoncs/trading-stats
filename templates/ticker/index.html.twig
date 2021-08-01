@@ -1,8 +1,47 @@
 {% extends 'base.html.twig' %}
 
-
 {% block main %}
-    <h3>Test1</h3>
+
+    <div class="row">
+        <div class="col-lg-2">
+            <div class="form-group">
+                <label class="control-label">Buscar Ticker</label>
+                <input class="form-control search_input" type="text">
+            </div>
+        </div>
+    </div>
+    <hr style="margin-top: 1px">
+    <div class="row">
+        <div class="col-lg-4">
+            <div class=scroll_style>
+                <table id="ticker_list" class="table table-hover ">
+                    <thead>
+                    <tr>
+                        <th>Ticker</th>
+                        <th>Import</th>
+                        <th>Last updated</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    {% for ticker in tickers %}
+                        <tr>
+                            <td>
+                                <a href={{ path('show_ticker',{'code':ticker.code}) }}>{{ ticker.code }}</a>
+                            </td>
+                            <td>
+                                <a href={{ path('import_csv',{'code':ticker.code}) }} >Importar</a>
+                            </td>
+                            <td>
+                                {{ ticker.updated |date("d/m/Y" )}}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block sidebar %}

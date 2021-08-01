@@ -38,11 +38,20 @@ class TickerController extends AbstractController
 {
     /**
      * @Route("/", methods="GET", name="ticker_index")
-     * @Cache(smaxage="10")
+     * @Cache(smaxage="3600")
      */
-    public function index(Request $request): Response
+    public function index(TickerRepository $tickerRepository): Response
     {
-        return $this->render('ticker/index.html.twig', []);
+        $response = $this->render('ticker/index.html.twig', ['tickers'=>$tickerRepository->findAll()]);
+
+//        // cache publicly for 3600 seconds
+//        $response->setPublic();
+//        $response->setMaxAge(3600);
+//
+//        // (optional) set a custom Cache-Control directive
+//        $response->headers->addCacheControlDirective('must-revalidate', true);
+//
+        return $response;
     }
 
     /**
@@ -53,6 +62,11 @@ class TickerController extends AbstractController
         $tp1 = $tickerPerformanceRepository->findByDay($ticker,1);
         $tp2 = $tickerPerformanceRepository->findByDay($ticker,2);
         $tp3 = $tickerPerformanceRepository->findByDay($ticker,3);
+
+        if($tp1->count() == 0){
+            $this->addFlash('danger', "No hay registros");
+            return $this->redirectToRoute('ticker_index');
+        }
 
         return $this->render('ticker/show_data.html.twig',
             [
@@ -76,13 +90,23 @@ class TickerController extends AbstractController
 
         $filePath = $this->getParameter('csv_file_location').$ticker->getCode().".csv";
 
-        $importer = new ImporCSVTickerProcess($tickerAverageRepository,
-                                                $tickerPerformanceRepository,
-                                                    $this->getDoctrine()->getManager());
+        $rows = 0;
+        try{
 
-        $rows = $importer->import($ticker, $sector, $industry, $filePath);
+            $importer = new ImporCSVTickerProcess($tickerAverageRepository,
+                                                    $tickerPerformanceRepository,
+                                                        $this->getDoctrine()->getManager());
 
-        return $this->json(array('rowCount'=> $rows));
+            $rows = $importer->import($ticker, $sector, $industry, $filePath);
+
+
+        }catch (\Exception $e){
+
+            $this->addFlash('danger', "El CSV no esta en el folder");
+        }
+
+        return $this->render('ticker/import_csv.html.twig', ['rowCount'=> $rows,'ticker'=>$ticker->getCode()]);
+
     }
 
     /**

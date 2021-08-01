@@ -15,19 +15,24 @@ class ImporterCSV
         $arrRow = [];
         $i = 0;
 
-        if (($fp = fopen($file, "r")) !== FALSE) {
+        try{
 
-            while (($row = fgetcsv($fp, 1000, ",")) !== FALSE) {
-                $num = count($row);
+            if (($fp = fopen($file, "r")) !== FALSE) {
 
-                $i++;
-                for ($c=0; $c < $num; $c++) {
-                    $arrRow[$i][] = $row[$c];
+                while (($row = fgetcsv($fp, 1000, ",")) !== FALSE) {
+                    $num = count($row);
+
+                    $i++;
+                    for ($c=0; $c < $num; $c++) {
+                        $arrRow[$i][] = $row[$c];
+                    }
                 }
-            }
-            fclose($fp);
+                fclose($fp);
 
-            return $arrRow;
+                return $arrRow;
+            }
+        } catch (\Exception $e) {
+            throw new \ErrorException($e->getMessage());
         }
     }
 }
